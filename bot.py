@@ -120,6 +120,16 @@ def processPayment(call):
     else:
         pay = const.days90
     address = createBTCAddress()
+    cur = db.cursor()
+    r = 'SELECT * FROM TEMP_DETAILS WHERE ID = %s'
+    cur.execute(r, call.message.chat.id)
+    if cur.fetchone():
+        r = 'UPDATE TEMP_DETAILS SET BTC_ADDRESS = %s WHERE ID = %s'
+        cur.execute(r, (address, call.message.chat.id))
+    else:
+        r = 'INSERT INTO TEMP_DETAILS (ID, BTC_ADDRESS) VALUES (%s, %s)'
+        cur.execute(r, (call.message.chat.id, address))
+    db.commit()
     bot.send_message(call.message.chat.id, const.paymentMsg.format(pay, address), parse_mode="html")
 
 
@@ -134,30 +144,30 @@ def createBTCAddress():
     response = requests.post(url, data).json()
     return response.get("data").get("address")
 
-
-def daily_check():
-    with sqlite3.connect(const.dbName) as db:
-        cursor = db.cursor()
-        sql = 'SELECT uid, end_date FROM payments'
-        res = cursor.execute(sql).fetchall()
-        today = str(datetime.datetime.now()).split(' ')[0]
-        after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
-        print(after_tomorrow)
-        for user in res:
-            if after_tomorrow == parser.parse(str(user[1])):
-                text = 'У вас истекает подписка.'
-                bot.send_message(user[0], text)
-                send_payment_message(user[0])
-                time.sleep(0.1)
-            if parser.parse(str(user[1])) <= parser.parse(today):
-                text = 'Время действия вашей подписки окончено.'
-                bot.send_message(user[0], text)
-                send_payment_message(user[0])
-                # Delete user from DataBase
-                sql = 'DELETE FROM payments WHERE uid=?'
-                cursor.execute(sql, (user[0],))
-                time.sleep(0.1)
-        db.commit()
+#
+# def daily_check():
+#     with sqlite3.connect(const.dbName) as db:
+#         cursor = db.cursor()
+#         sql = 'SELECT uid, end_date FROM payments'
+#         res = cursor.execute(sql).fetchall()
+#         today = str(datetime.datetime.now()).split(' ')[0]
+#         after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
+#         print(after_tomorrow)
+#         for user in res:
+#             if after_tomorrow == parser.parse(str(user[1])):
+#                 text = 'У вас истекает подписка.'
+#                 bot.send_message(user[0], text)
+#                 send_payment_message(user[0])
+#                 time.sleep(0.1)
+#             if parser.parse(str(user[1])) <= parser.parse(today):
+#                 text = 'Время действия вашей подписки окончено.'
+#                 bot.send_message(user[0], text)
+#                 send_payment_message(user[0])
+#                 # Delete user from DataBase
+#                 sql = 'DELETE FROM payments WHERE uid=?'
+#                 cursor.execute(sql, (user[0],))
+#                 time.sleep(0.1)
+#         db.commit()
 
 
 def send_payment_message(cid):
