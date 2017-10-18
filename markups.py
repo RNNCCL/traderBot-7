@@ -3,7 +3,7 @@ import const
 
 def mainMenu():
     markup = telebot.types.ReplyKeyboardMarkup(True, False)
-    markup.row("Маркетинг", "Маркетинговые матриалы")
+    markup.row("Маркетинг", "🚀 Маркетинговые матриалы")
     markup.row("Посмотреть отзывы", "Начать работу")
     return markup
 
@@ -31,8 +31,8 @@ def startWork():
     socialNetworksBtn = telebot.types.InlineKeyboardButton(text="Социальные сети", callback_data="socialNetworks")
     markup.add(payBtn)
     markup.add(profit)
-    markup.row(news, conditions)
-    markup.add(socialNetworksBtn)
+    markup.row(news, socialNetworksBtn)
+    markup.add(conditions)
     return markup
 
 

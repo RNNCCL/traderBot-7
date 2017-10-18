@@ -67,7 +67,7 @@ def start(message):
     bot.send_message(message.chat.id, const.startMsg, reply_markup=markups.mainMenu())
 
 
-@bot.message_handler(regexp="Маркетинговые материалы")
+@bot.message_handler(regexp="🚀 Маркетинговые материалы")
 def materials(message):
     bot.send_message(message.chat.id, "Выберите маркетинговый материал", reply_markup=markups.materials())
 
