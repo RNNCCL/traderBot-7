@@ -71,12 +71,12 @@ def start(message):
 def materials(message):
     print('done')
     bot.send_message(message.chat.id, "Выберите маркетинговый материал", reply_markup=markups.materials())
-
-
-@bot.message_handler(regexp="Маркетинг")
-def marketing(message):
-    print(message.text)
-    bot.send_message(message.chat.id, const.marketingMsg)
+#
+#
+# @bot.message_handler(regexp="Маркетинг")
+# def marketing(message):
+#     print(message.text)
+#     bot.send_message(message.chat.id, const.marketingMsg)
 
 
 @bot.message_handler(regexp="Начать работу")
