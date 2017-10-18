@@ -61,7 +61,7 @@ def start(message):
     r = 'SELECT * FROM users WHERE uid = %s'
     cur.execute(r, message.chat.id)
     if not cur.fetchone():
-        r = "INSERT INTO users uid VALUE %s"
+        r = "INSERT INTO users (uid) VALUE (%s)"
         cur.execute(r, message.chat.id)
         db.commit()
     bot.send_message(message.chat.id, const.startMsg, reply_markup=markups.mainMenu())
