@@ -2,7 +2,6 @@ import telebot
 import logging
 import const
 import markups
-import sqlite3
 import datetime
 import parser
 import time
@@ -10,6 +9,7 @@ import requests
 import hashlib
 from aiohttp import web
 import ssl
+import pymysql as sql
 
 
 
@@ -52,12 +52,17 @@ async def handle(request):
 
 app.router.add_post('/{token}/', handle)
 
+db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    with sqlite3.connect(const.dbName) as db:
-        cursor = db.cursor()
-        cursor.execute('INSERT INTO users (uid) VALUES (?)', (str(message.chat.id),))
+    cur = db.cursor()
+    r = 'SELECT * FROM users WHERE uid = %s'
+    cur.execute(r, message.chat.id)
+    if not cur.fetchone():
+        r = "INSERT INTO users uid VALUE %s"
+        cur.execute(r, message.chat.id)
         db.commit()
     bot.send_message(message.chat.id, const.startMsg, reply_markup=markups.mainMenu())
 
