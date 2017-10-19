@@ -100,7 +100,7 @@ def getUserBalance(uid):
 
 @bot.message_handler(regexp="Партнерская программа")
 def materials(message):
-    balance = "<b>Ваш баланс:</b> %s BTC\n" % getUserBalance()
+    balance = "<b>Ваш баланс:</b> %s BTC\n" % getUserBalance(message.chat.id)
     text = "<b>Ваша реферальная ссылка:</b>\nhttps://t.me/arthur1bot?start=%s" % message.chat.id
     bot.send_message(message.chat.id, balance + text,  parse_mode="html", reply_markup=markups.withdrawBtn())
 
