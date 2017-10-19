@@ -53,40 +53,38 @@ async def handle(request):
 
 app.router.add_post('/{token}/', handle)
 
-#db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
 
 
 def daily_check():
-    with sql.connect("localhost", "root", "churchbynewton", "TRADER") as db:
-        cur = db.cursor()
-        r = 'SELECT uid, end_date FROM payments'
-        res = cur.execute(r).fetchall()
-        today = str(datetime.datetime.now()).split(' ')[0]
-        after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
-        for user in res:
-            if after_tomorrow == parser.parse(str(user[1])):
-                text = 'У вас истекает подписка.'
-                bot.send_message(user[0], text, reply_markup=markups.payBtnMarkup())
-                time.sleep(0.1)
-            if parser.parse(str(user[1])) <= parser.parse(today):
-                text = 'Время действия вашей подписки окончено.'
-                bot.send_message(user[0], text)
-                r = 'DELETE FROM payments WHERE uid=?'
-                cur.execute(r, (user[0],))
-                time.sleep(0.1)
-        db.commit()
+    cur = db.cursor()
+    r = 'SELECT uid, end_date FROM payments'
+    res = cur.execute(r).fetchall()
+    today = str(datetime.datetime.now()).split(' ')[0]
+    after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
+    for user in res:
+        if after_tomorrow == parser.parse(str(user[1])):
+            text = 'У вас истекает подписка.'
+            bot.send_message(user[0], text, reply_markup=markups.payBtnMarkup())
+            time.sleep(0.1)
+        if parser.parse(str(user[1])) <= parser.parse(today):
+            text = 'Время действия вашей подписки окончено.'
+            bot.send_message(user[0], text)
+            r = 'DELETE FROM payments WHERE uid=?'
+            cur.execute(r, (user[0],))
+            time.sleep(0.1)
+    db.commit()
 
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    with sql.connect("localhost", "root", "churchbynewton", "TRADER") as db:
-        cur = db.cursor()
-        r = 'SELECT * FROM users WHERE uid = %s'
+    cur = db.cursor()
+    r = 'SELECT * FROM users WHERE uid = %s'
+    cur.execute(r, message.chat.id)
+    if not cur.fetchone():
+        r = "INSERT INTO users (uid) VALUE (%s)"
         cur.execute(r, message.chat.id)
-        if not cur.fetchone():
-            r = "INSERT INTO users (uid) VALUE (%s)"
-            cur.execute(r, message.chat.id)
-            db.commit()
+        db.commit()
     bot.send_message(message.chat.id, const.startMsg % message.chat.id, reply_markup=markups.mainMenu(), parse_mode="html")
 
 
@@ -181,17 +179,16 @@ def processPayment(call):
     else:
         pay = const.days90
     address = createBTCAddress()
-    with sql.connect("localhost", "root", "churchbynewton", "TRADER") as db:
-        cur = db.cursor()
-        r = 'SELECT * FROM TEMP_DETAILS WHERE ID = %s'
-        cur.execute(r, call.message.chat.id)
-        if cur.fetchone():
-            r = 'UPDATE TEMP_DETAILS SET BTC_ADDRESS = %s WHERE ID = %s'
-            cur.execute(r, (address, call.message.chat.id))
-        else:
-            r = 'INSERT INTO TEMP_DETAILS (ID, BTC_ADDRESS) VALUES (%s, %s)'
-            cur.execute(r, (call.message.chat.id, address))
-        db.commit()
+    cur = db.cursor()
+    r = 'SELECT * FROM TEMP_DETAILS WHERE ID = %s'
+    cur.execute(r, call.message.chat.id)
+    if cur.fetchone():
+        r = 'UPDATE TEMP_DETAILS SET BTC_ADDRESS = %s WHERE ID = %s'
+        cur.execute(r, (address, call.message.chat.id))
+    else:
+        r = 'INSERT INTO TEMP_DETAILS (ID, BTC_ADDRESS) VALUES (%s, %s)'
+        cur.execute(r, (call.message.chat.id, address))
+    db.commit()
     bot.send_message(call.message.chat.id, const.paymentMsg.format(pay, address), parse_mode="html")
 
 
