@@ -78,3 +78,9 @@ def chooseDuration():
     markup.add(btn4)
     return markup
 
+
+def withdrawBtn():
+    markup = telebot.types.InlineKeyboardMarkup()
+    btn = telebot.types.InlineKeyboardButton(text="Вывести", callback_data="withdraw")
+    markup.add(btn)
+    return markup

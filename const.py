@@ -40,7 +40,8 @@ days15 = 0.018
 days30 = 0.030
 days60 = 0.055
 days90 = 0.07
-
+admin = 248835526
+values = {}
 dbName = "clientbase.db"
 
 wallet_id = "F102745422"
