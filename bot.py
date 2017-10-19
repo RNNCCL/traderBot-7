@@ -88,13 +88,11 @@ def start(message):
     bot.send_message(message.chat.id, const.startMsg % message.chat.id, reply_markup=markups.mainMenu(), parse_mode="html")
 
 
-
 def getUserBalance(uid):
-    with sql.connect("localhost", "root", "churchbynewton", "TRADER") as db:
-        cur = db.cursor()
-        r = "SELECT balance FROM users WHERE uid = %s"
-        cur.execute(r, uid)
-        balance = cur.fetchone()
+    cur = db.cursor()
+    r = "SELECT balance FROM users WHERE uid = %s"
+    cur.execute(r, uid)
+    balance = cur.fetchone()
     return balance[0] / 100000000
 
 
