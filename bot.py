@@ -2,14 +2,15 @@ import telebot
 import logging
 import const
 import markups
-import datetime
-import parser
-import time
 import requests
 import hashlib
 from aiohttp import web
 import ssl
 import pymysql as sql
+import datetime
+import parser
+import time
+
 
 
 
@@ -55,6 +56,27 @@ app.router.add_post('/{token}/', handle)
 db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
 
 
+def daily_check():
+    cur = db.cursor()
+    r = 'SELECT uid, end_date FROM payments'
+    res = cur.execute(r).fetchall()
+    today = str(datetime.datetime.now()).split(' ')[0]
+    after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
+    for user in res:
+        if after_tomorrow == parser.parse(str(user[1])):
+            text = 'У вас истекает подписка.'
+            bot.send_message(user[0], text)
+            send_payment_message(user[0])
+            time.sleep(0.1)
+        if parser.parse(str(user[1])) <= parser.parse(today):
+            text = 'Время действия вашей подписки окончено.'
+            bot.send_message(user[0], text)
+            r = 'DELETE FROM payments WHERE uid=?'
+            cur.execute(r, (user[0],))
+            time.sleep(0.1)
+    db.commit()
+
+
 @bot.message_handler(commands=["start"])
 def start(message):
     cur = db.cursor()
@@ -64,23 +86,23 @@ def start(message):
         r = "INSERT INTO users (uid) VALUE (%s)"
         cur.execute(r, message.chat.id)
         db.commit()
-    bot.send_message(message.chat.id, const.startMsg, reply_markup=markups.mainMenu())
+    bot.send_message(message.chat.id, const.startMsg % message.chat.id, reply_markup=markups.mainMenu(), parse_mode="html")
 
 
-@bot.message_handler(regexp="🚀 Маркетинговые материалы")
+@bot.message_handler(regexp="Партнерская программа")
 def materials(message):
-    bot.send_message(message.chat.id, "Выберите маркетинговый материал", reply_markup=markups.materials())
+    text = "<b>Ваша реферальная ссылка:</b>\nhttps://t.me/arthur1bot?start=%s"
+    bot.send_message(message.chat.id, text % message.chat.id, reply_markup=markups.materials())
 
 
 @bot.message_handler(regexp="Маркетинг")
 def marketing(message):
-    print(message.text)
-    bot.send_message(message.chat.id, const.marketingMsg)
+    bot.send_message(message.chat.id, const.marketingMsg, parse_mode="html")
 
 
 @bot.message_handler(regexp="Начать работу")
 def startWork(message):
-    bot.send_message(message.chat.id, const.startWorkMsg, reply_markup=markups.startWork())
+    bot.send_message(message.chat.id, const.startWorkMsg % (const.days15, const.days90), reply_markup=markups.startWork())
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "conditions")
@@ -145,30 +167,6 @@ def createBTCAddress():
     response = requests.post(url, data).json()
     return response.get("data").get("address")
 
-#
-# def daily_check():
-#     with sqlite3.connect(const.dbName) as db:
-#         cursor = db.cursor()
-#         sql = 'SELECT uid, end_date FROM payments'
-#         res = cursor.execute(sql).fetchall()
-#         today = str(datetime.datetime.now()).split(' ')[0]
-#         after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
-#         print(after_tomorrow)
-#         for user in res:
-#             if after_tomorrow == parser.parse(str(user[1])):
-#                 text = 'У вас истекает подписка.'
-#                 bot.send_message(user[0], text)
-#                 send_payment_message(user[0])
-#                 time.sleep(0.1)
-#             if parser.parse(str(user[1])) <= parser.parse(today):
-#                 text = 'Время действия вашей подписки окончено.'
-#                 bot.send_message(user[0], text)
-#                 send_payment_message(user[0])
-#                 # Delete user from DataBase
-#                 sql = 'DELETE FROM payments WHERE uid=?'
-#                 cursor.execute(sql, (user[0],))
-#                 time.sleep(0.1)
-#         db.commit()
 
 
 def send_payment_message(cid):

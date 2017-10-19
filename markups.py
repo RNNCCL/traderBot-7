@@ -3,7 +3,7 @@ import const
 
 def mainMenu():
     markup = telebot.types.ReplyKeyboardMarkup(True, False)
-    markup.row("Маркетинг", "🚀 Маркетинговые материалы")
+    markup.row("Маркетинг", "Партнерская программа")
     markup.row("Посмотреть отзывы", "Начать работу")
     return markup
 
