@@ -1,25 +1,40 @@
 import telebot
 import const
 
-def mainMenu():
+
+def mainMenu(uid):
     markup = telebot.types.ReplyKeyboardMarkup(True, False)
     markup.row("Маркетинг", "Партнерская программа")
     markup.row("Посмотреть отзывы", "Начать работу")
+    if uid == const.admin:
+        markup.row("Админ-панель")
     return markup
 
 
-def materials():
+def adminPanel():
     markup = telebot.types.InlineKeyboardMarkup()
-    btn1 = telebot.types.InlineKeyboardButton(text="Баннер 120х200", callback_data="banner120*200")
-    btn2 = telebot.types.InlineKeyboardButton(text="Баннер 240х400", callback_data="banner240*400")
-    btn3 = telebot.types.InlineKeyboardButton(text="Баннер 468х60", callback_data="banner468*60")
-    btn4 = telebot.types.InlineKeyboardButton(text="Баннер 728х90", callback_data="banner728*90")
-    btn5 = telebot.types.InlineKeyboardButton(text="Логотип", callback_data="logo")
-    btn6 = telebot.types.InlineKeyboardButton(text="Презентация", callback_data="presentation")
-    markup.row(btn1, btn2)
-    markup.row(btn3, btn4)
-    markup.row(btn5, btn6)
+    allBtn = telebot.types.InlineKeyboardButton(text="Рассылка всем пользователям", callback_data="toAll")
+    paid = telebot.types.InlineKeyboardButton(text="Рассылка по подписке", callback_data="toPaid")
+    video = telebot.types.InlineKeyboardButton(text="Добавить видео", callback_data="addVideo")
+    markup.row(allBtn)
+    markup.row(paid)
+    markup.row(video)
     return markup
+
+
+
+# def materials():
+#     markup = telebot.types.InlineKeyboardMarkup()
+#     btn1 = telebot.types.InlineKeyboardButton(text="Баннер 120х200", callback_data="banner120*200")
+#     btn2 = telebot.types.InlineKeyboardButton(text="Баннер 240х400", callback_data="banner240*400")
+#     btn3 = telebot.types.InlineKeyboardButton(text="Баннер 468х60", callback_data="banner468*60")
+#     btn4 = telebot.types.InlineKeyboardButton(text="Баннер 728х90", callback_data="banner728*90")
+#     btn5 = telebot.types.InlineKeyboardButton(text="Логотип", callback_data="logo")
+#     btn6 = telebot.types.InlineKeyboardButton(text="Презентация", callback_data="presentation")
+#     markup.row(btn1, btn2)
+#     markup.row(btn3, btn4)
+#     markup.row(btn5, btn6)
+#     return markup
 
 
 def startWork():

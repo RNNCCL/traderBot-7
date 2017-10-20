@@ -42,7 +42,6 @@ days60 = 0.055
 days90 = 0.07
 admin = 248835526
 values = {}
-dbName = "clientbase.db"
 
 wallet_id = "F102745422"
 walletApiKey = "8B8793CAC68F8CE9678D9D907A0E07BB"

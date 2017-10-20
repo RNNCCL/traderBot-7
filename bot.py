@@ -53,10 +53,11 @@ async def handle(request):
 
 app.router.add_post('/{token}/', handle)
 
-db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+
 
 
 def daily_check():
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
     cur = db.cursor()
     r = 'SELECT uid, end_date FROM payments'
     res = cur.execute(r).fetchall()
@@ -74,10 +75,29 @@ def daily_check():
             cur.execute(r, (user[0],))
             time.sleep(0.1)
     db.commit()
+    db.close()
+
+
+def addInvitation(user_id, invited_user_id):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT * FROM INVITATIONS WHERE INVITED=%s"
+    cur.execute(r, invited_user_id)
+    if not cur.fetchone() and int(user_id) != int(invited_user_id):
+        r = "INSERT INTO INVITATIONS (ID, INVITED) VALUES (%s, %s)"
+        cur.execute(r, (user_id, invited_user_id))
+        db.commit()
+    db.close()
 
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    text = message.text.split(" ")
+    if len(text) == 2:
+        if text[1].isdigit():
+            initial_id = text[1]
+            addInvitation(initial_id, message.chat.id)
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
     cur = db.cursor()
     r = 'SELECT * FROM users WHERE uid = %s'
     cur.execute(r, message.chat.id)
@@ -85,15 +105,104 @@ def start(message):
         r = "INSERT INTO users (uid) VALUE (%s)"
         cur.execute(r, message.chat.id)
         db.commit()
-    bot.send_message(message.chat.id, const.startMsg % message.chat.id, reply_markup=markups.mainMenu(), parse_mode="html")
+    bot.send_message(message.chat.id, const.startMsg % message.chat.id, reply_markup=markups.mainMenu(message.chat.id),
+                     parse_mode="html")
+    db.close()
 
 
 def getUserBalance(uid):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
     cur = db.cursor()
     r = "SELECT balance FROM users WHERE uid = %s"
     cur.execute(r, uid)
     balance = cur.fetchone()
+    db.close()
     return balance[0] / 100000000
+
+
+def getIds():
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT uid FROM users"
+    cur.execute(r)
+    data = cur.fetchall()
+    db.close()
+    res = []
+    for i in data:
+        res.append(i[0])
+    return res
+
+
+def getPaidIds():
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT uid FROM payments"
+    cur.execute(r)
+    data = cur.fetchall()
+    db.close()
+    res = []
+    for i in data:
+        res.append(i[0])
+    return res
+
+
+@bot.message_handler(regexp="Админ-панель")
+def admin(message):
+    if message.chat.id == const.admin:
+        bot.send_message(message.chat.id, "Админ-панель", reply_markup=markups.adminPanel())
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "addVideo")
+def addVideo(call):
+    msg = bot.send_message(call.message.chat.id, "Введите ссылку на видео")
+    bot.register_next_step_handler(msg, )
+
+
+def getVideo(message):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = 'INSERT INTO VIDEO (link) VALUES (%s)'
+    cur.execute(r, message.text)
+    db.commit()
+    db.close()
+    bot.send_message(message.chat.id, "Видео успешно добавлено!")
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "toAll")
+def getText(call):
+    msg = bot.send_message(call.message.chat.id, "Введите текст, который хотите отправить всем пользователям")
+    bot.register_next_step_handler(msg, simpleDistribution)
+
+
+def simpleDistribution(message):
+    count = 0
+    for user_id in getIds():
+        if user_id == const.admin:
+            continue
+        if count == 20:
+            time.sleep(1)
+        bot.send_message(user_id, message.text)
+        count += 1
+    bot.send_message(message.chat.id, "Сообщение успешно отправлено всем пользователям!")
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "toPaid")
+def getText1(call):
+    msg = bot.send_message(call.message.chat.id, "Введите текст, который хотите отправить пользователям,"
+                                                 " которые оплатили подписку")
+    bot.register_next_step_handler(msg, simpleDistribution)
+
+
+def paidDistribution(message):
+    count = 0
+    for user_id in getIds():
+        if user_id == const.admin:
+            continue
+        if count == 20:
+            time.sleep(1)
+        bot.send_message(user_id, message.text)
+        count += 1
+    bot.send_message(message.chat.id, "Сообщение успешно отправлено всем пользователям!")
 
 
 @bot.message_handler(regexp="Партнерская программа")
@@ -119,13 +228,12 @@ def checkSum(message):
         else:
             bot.send_message(message.chat.id, "Недостаточно средств")
     except:
-        msg = bot.send_message(message.chat.id, "Неккоректная сумма, попробуйте еще раз")
-        bot.register_next_step_handler(msg, checkSum)
+        bot.send_message(message.chat.id, "Неккоректная сумма")
 
 
 def sendRequest(message):
-    bot.send_message(const.admin, "Новая заявка на вывод %s BTC на адрес %s"
-                     % (const.values.get(message.chat.id), message.text))
+    bot.send_message(const.admin, "Новая заявка на вывод %s BTC на адрес <b>%s<>/b"
+                     % (const.values.get(message.chat.id), message.text), parse_mode="html")
     bot.send_message(message.chat.id, "Ваша заявка отпралена!\nОжидайте подтверждения.")
 
 
@@ -137,6 +245,18 @@ def marketing(message):
 @bot.message_handler(regexp="Начать работу")
 def startWork(message):
     bot.send_message(message.chat.id, const.startWorkMsg % (const.days15, const.days90), reply_markup=markups.startWork())
+
+
+@bot.message_handler(regexp="Посмотреть отзывы")
+def showVideos(message):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT link FROM VIDEO"
+    cur.execute(r)
+    data = cur.fetchall()
+    for i in data:
+        bot.send_message(message.chat.id, i[0])
+        time.sleep(1)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "conditions")
@@ -177,6 +297,7 @@ def processPayment(call):
     else:
         pay = const.days90
     address = createBTCAddress()
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
     cur = db.cursor()
     r = 'SELECT * FROM TEMP_DETAILS WHERE ID = %s'
     cur.execute(r, call.message.chat.id)
@@ -187,6 +308,7 @@ def processPayment(call):
         r = 'INSERT INTO TEMP_DETAILS (ID, BTC_ADDRESS) VALUES (%s, %s)'
         cur.execute(r, (call.message.chat.id, address))
     db.commit()
+    db.close()
     bot.send_message(call.message.chat.id, const.paymentMsg.format(pay, address), parse_mode="html")
 
 
