@@ -221,7 +221,7 @@ def withdraw(call):
 def checkSum(message):
     try:
         value = float(message.text)
-        if value <= getUserBalance(message.chat.id):
+        if value <= getUserBalance(message.chat.id) and value > 0:
             const.values[message.chat.id] = value
             msg = bot.send_message(message.chat.id, "Введите адрес, на который будет произведена выплата")
             bot.register_next_step_handler(msg, sendRequest)
@@ -232,8 +232,8 @@ def checkSum(message):
 
 
 def sendRequest(message):
-    bot.send_message(const.admin, "Новая заявка на вывод %s BTC на адрес <b>%s<>/b"
-                     % (const.values.get(message.chat.id), message.text), parse_mode="html")
+    bot.send_message(const.admin, "Новая заявка на вывод %s BTC на адрес %s"
+                     % (const.values.get(message.chat.id), message.text))
     bot.send_message(message.chat.id, "Ваша заявка отпралена!\nОжидайте подтверждения.")
 
 
