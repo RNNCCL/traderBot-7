@@ -155,7 +155,7 @@ def admin(message):
 @bot.callback_query_handler(func=lambda call: call.data == "addVideo")
 def addVideo(call):
     msg = bot.send_message(call.message.chat.id, "Введите ссылку на видео")
-    bot.register_next_step_handler(msg, )
+    bot.register_next_step_handler(msg, getVideo)
 
 
 def getVideo(message):
