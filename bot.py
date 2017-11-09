@@ -71,7 +71,7 @@ def daily_check():
             text = 'Время действия вашей подписки окончено.'
             bot.send_message(user[0], text)
             r = 'DELETE FROM payments WHERE uid=?'
-            cur.execute(r, (user[0],))
+            cur.execute(r, user[0])
             time.sleep(0.1)
     db.commit()
     db.close()
