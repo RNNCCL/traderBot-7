@@ -8,7 +8,7 @@ from aiohttp import web
 import ssl
 import pymysql as sql
 import datetime
-import parser
+from dateutil import parser
 import time
 
 
@@ -54,13 +54,12 @@ async def handle(request):
 app.router.add_post('/{token}/', handle)
 
 
-
-
 def daily_check():
     db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
     cur = db.cursor()
     r = 'SELECT uid, end_date FROM payments'
-    res = cur.execute(r).fetchall()
+    cur.execute(r)
+    res = cur.fetchall()
     today = str(datetime.datetime.now()).split(' ')[0]
     after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
     for user in res:
