@@ -91,6 +91,7 @@ def addInvitation(user_id, invited_user_id):
 
 @bot.message_handler(commands=["start"])
 def start(message):
+    getUsers()
     text = message.text.split(" ")
     if len(text) == 2:
         if text[1].isdigit():
@@ -101,8 +102,9 @@ def start(message):
     r = 'SELECT * FROM users WHERE uid = %s'
     cur.execute(r, message.chat.id)
     if not cur.fetchone():
-        r = "INSERT INTO users (uid) VALUE (%s)"
-        cur.execute(r, message.chat.id)
+        r = "INSERT INTO users (uid, first_name, last_name, alias) VALUE (%s,%s,%s,%s)"
+        cur.execute(r, (message.chat.id, message.from_user.first_name,
+                        message.from_user.last_name, message.from_user.username))
         db.commit()
     bot.send_message(message.chat.id, const.startMsg % message.chat.id, reply_markup=markups.mainMenu(message.chat.id),
                      parse_mode="html")
@@ -145,6 +147,16 @@ def getPaidIds():
     return res
 
 
+def getUsers():
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT * FROM users"
+    cur.execute(r)
+    data = cur.fetchall()
+    db.close()
+    print(data)
+
+
 @bot.message_handler(regexp="Админ-панель")
 def admin(message):
     if message.chat.id == const.admin:
@@ -155,6 +167,13 @@ def admin(message):
 def addVideo(call):
     msg = bot.send_message(call.message.chat.id, "Введите ссылку на видео")
     bot.register_next_step_handler(msg, getVideo)
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "usersList")
+def showUsers(call):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = 'SELECT uid '
 
 
 def getVideo(message):
