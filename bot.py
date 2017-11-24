@@ -158,8 +158,8 @@ def getUsers():
     for user in data:
         k += 1
         res_string += str(k) + " ".join([user[2], user[3], user[4]]) + "\n"
-    print(res_string)
     db.close()
+    return res_string
 
 
 @bot.message_handler(regexp="Админ-панель")
@@ -176,9 +176,10 @@ def addVideo(call):
 
 @bot.callback_query_handler(func=lambda call: call.data == "usersList")
 def showUsers(call):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
-    cur = db.cursor()
-    r = 'SELECT uid '
+    large_text = getUsers()
+    splitted_text = telebot.util.split_string(large_text, 3000)
+    for text in splitted_text:
+        bot.send_message(call.message.chat.id, text)
 
 
 def getVideo(message):
