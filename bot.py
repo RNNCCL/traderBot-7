@@ -14,7 +14,7 @@ import time
 
 
 
-WEBHOOK_HOST = '85.143.175.233'
+WEBHOOK_HOST = '78.155.218.194'
 WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP address
 
@@ -153,8 +153,13 @@ def getUsers():
     r = "SELECT * FROM users"
     cur.execute(r)
     data = cur.fetchall()
+    res_string = ""
+    k = 0
+    for user in data:
+        k += 1
+        res_string += str(k) + " ".join([user[2], user[3], user[4]]) + "\n"
+    print(res_string)
     db.close()
-    print(data)
 
 
 @bot.message_handler(regexp="Админ-панель")
