@@ -91,7 +91,6 @@ def addInvitation(user_id, invited_user_id):
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    getUsers()
     text = message.text.split(" ")
     if len(text) == 2:
         if text[1].isdigit():
