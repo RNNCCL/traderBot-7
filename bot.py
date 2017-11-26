@@ -203,7 +203,7 @@ def getUsers():
     const.userList.clear()
     db.close()
     for user in data:
-        const.userList.append(user[2] + " " + user[3] + '%' + user[0])
+        const.userList.append(user[2] + " " + user[3] + '%' + str(user[0]))
     const.userList.sort()
     return const.userList
 
