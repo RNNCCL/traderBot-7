@@ -111,7 +111,7 @@ def users():
         markup.row(back, forward)
     elif f:
         markup.row(forward)
-    else:
+    elif b:
         markup.row(back)
     markup.row(menu)
     return markup
