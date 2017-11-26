@@ -255,6 +255,7 @@ def handle_days(message):
             time.sleep(0.1)
         db.commit()
         db.close()
+        bot.send_message(message.chat.id, "Демо режим включен для всех пользователей на %s дней" % message.text, reply_markup=markups.adminPanel())
     except:
         bot.send_message(message.chat.id, "Неправильный формат")
 
