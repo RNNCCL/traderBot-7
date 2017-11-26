@@ -166,8 +166,8 @@ def admin(message):
 
 @bot.callback_query_handler(func=lambda call: call.data == "admin")
 def admin2(call):
-    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.adminPanel())
     bot.edit_message_text("Админ-панель", call.message.chat.id, call.message.message_id)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.adminPanel())
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "addVideo")
@@ -180,8 +180,8 @@ def addVideo(call):
 def showUsers(call):
     const.listPointer = 0
     getUsers()
-    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.users())
     bot.edit_message_text("Список пользователей", call.message.chat.id, call.message.message_id)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.users())
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "nextList")
