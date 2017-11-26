@@ -63,8 +63,8 @@ def daily_check():
     r = "SELECT state, days FROM demo WHERE id = 1"
     cur.execute(r)
     state, days_left = cur.fetchone()
-    if state == "1":
-        if days_left == "0":
+    if state:
+        if days_left == 0:
             r = "UPDATE demo SET state = 0 WHERE id = 1"
         else:
             r = "UPDATE demo SET days = days - 1 WHERE id = 1"
@@ -224,7 +224,7 @@ def turn_off(call):
     if state:
         bot.send_message(call.message.chat.id, "Демо режим будет работать для пользователей еще %s дней" % str(days), reply_markup=markups.adminPanel())
     else:
-        msg = bot.send_message(call.message.chat.id, "Введите количество дней, на которое хотите включить")
+        bot.send_message(call.message.chat.id, "Демо режим выключен", reply_markup=markups.adminPanel())
 
 
 def handle_days(message):
