@@ -237,7 +237,6 @@ def handle_days(message):
         cur.execute(r)
         r = "UPDATE demo SET days = %s"
         cur.execute(r, days)
-        db.commit()
         r = "SELECT uid FROM users"
         cur.execute(r)
         ids = cur.fetchall()
@@ -254,7 +253,8 @@ def handle_days(message):
                 request = "INSERT INTO payments (uid, end_date) VALUE (%s,%s)"
                 cur.execute(request, (user, end_day))
             time.sleep(0.1)
-
+        db.commit()
+        db.close()
     except:
         bot.send_message(message.chat.id, "Неправильный формат")
 
