@@ -98,7 +98,7 @@ def users():
         if const.listPointer * 10 + i > length - 1:
             break
         data = const.userList[const.listPointer * 10 + i]
-        symbol = data[:data.find('%')]
+        symbol = data.find('%')
         btn = telebot.types.InlineKeyboardButton(text=data[:symbol], callback_data="<" + data[symbol:])
         markup.row(btn)
     f, b = False, False
