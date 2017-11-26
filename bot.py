@@ -224,13 +224,15 @@ def detailedInfo(call):
     r = "SELECT INVITED FROM INVITATIONS WHERE ID = %s"
     cur.execute(r, call.data[1:])
     ids = cur.fetchall()
-    text += "\nПригласил следующий список пользователей:\n"
     if ids:
+        text += "\nПригласил следующий список пользователей:\n"
         res = ""
         for user in ids:
             r = "SELECT first_name, last_name from users WHERE uid = %s"
             cur.execute(r, user)
             print(cur.fetchone())
+    else:
+        text += "\nЕще не пригласил ни одного пользователя"
     db.close()
     bot.edit_message_text(text, call.message.chat.id, call.message.message_id)
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
@@ -258,6 +260,9 @@ def confirm_date(message):
         cur.execute(r, (date, const.chosenUserId))
         db.commit()
         db.close()
+        bot.send_message(message.chat.id, "Срок подписки изменен", reply_markup=markups.adminPanel())
+    else:
+        bot.send_message(message.chat.id, "Неправильный формат ввода", reply_markup=markups.adminPanel())
 
 
 def getVideo(message):
