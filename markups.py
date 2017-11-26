@@ -122,7 +122,7 @@ def users():
 def showDetails(uid):
     markup = telebot.types.InlineKeyboardMarkup()
     changeData = telebot.types.InlineKeyboardButton(text="Изменить срок подписки", callback_data="changeDate" + uid)
-    back = telebot.types.InlineKeyboardButton(text="Назад", callback_data="userList")
+    back = telebot.types.InlineKeyboardButton(text="Назад", callback_data="usersList")
     markup.row(changeData)
     markup.row(back)
     return markup
