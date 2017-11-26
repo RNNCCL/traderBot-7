@@ -221,11 +221,11 @@ def turn_off(call):
     r = "SELECT state, days from demo"
     cur.execute(r)
     state, days = cur.fetchone()
+    print(state, days)
     if state == "1":
         bot.send_message(call.message.chat.id, "Демо режим будет работать для пользователей еще %s дней" % days, reply_markup=markups.adminPanel())
     else:
         msg = bot.send_message(call.message.chat.id, "Введите количество дней, на которое хотите включить")
-        bot.register_next_step_handler(msg, handle_days)
 
 
 def handle_days(message):
