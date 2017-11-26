@@ -163,6 +163,7 @@ def admin(message):
     if message.chat.id == const.admin:
         bot.send_message(message.chat.id, "Админ-панель", reply_markup=markups.adminPanel())
 
+
 @bot.callback_query_handler(func=lambda call: call.data == "admin")
 def admin2(call):
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.adminPanel())
@@ -179,7 +180,8 @@ def addVideo(call):
 def showUsers(call):
     const.listPointer = 0
     getUsers()
-    bot.send_message(call.message.chat.id, "Список пользователей", reply_markup=markups.users())
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.users())
+    bot.edit_message_text("Список пользователей", call.message.chat.id, call.message.message_id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "nextList")
