@@ -1,5 +1,5 @@
-#token = "317025779:AAFLih4bH_BjKIm8_giC-wD1geEd8d_tLCI"
-token = "352564414:AAGW7tYoe43sbYUYJ-pKhP2-gjK_hebKGF8"
+token = "317025779:AAFLih4bH_BjKIm8_giC-wD1geEd8d_tLCI"
+#token = "352564414:AAGW7tYoe43sbYUYJ-pKhP2-gjK_hebKGF8"
 startMsg = "Привет! Меня зовут BestCryptoInsideBot," \
            " я создан для постоянного сопровождения вас в криптовалютной биржевой торговле.\n\n" \
            "Я с радостью помогу вам:\n" \
