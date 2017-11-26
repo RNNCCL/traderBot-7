@@ -238,7 +238,7 @@ def detailedInfo(call):
 @bot.callback_query_handler(func=lambda call: call.data[0:10] == "changeDate")
 def changeDate(call):
     const.chosenUserId = call.data[10:]
-    msg = bot.send_message(call.message.chat.id, "Введите дату формате 2017-03-23 <b>(гггг-мм-чч)</b>\n")
+    msg = bot.send_message(call.message.chat.id, "Введите дату формате 2017-03-23 <b>(гггг-мм-чч)</b>\n", parse_mode="html")
     bot.register_next_step_handler(msg, confirm_date)
 
 

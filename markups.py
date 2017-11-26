@@ -99,7 +99,7 @@ def users():
             break
         data = const.userList[const.listPointer * 10 + i]
         symbol = data.find('%')
-        btn = telebot.types.InlineKeyboardButton(text=data[:symbol], callback_data="<" + data[symbol:])
+        btn = telebot.types.InlineKeyboardButton(text=data[:symbol], callback_data="<" + data[symbol+1:])
         markup.row(btn)
     f, b = False, False
     if i == 9:
