@@ -243,7 +243,7 @@ def handle_days(message):
         ids = cur.fetchall()
         print(ids)
         today = str(datetime.datetime.now()).split(' ')[0]
-        end_day = str(parser.parse(today) + datetime.timedelta(days=days)).split(' ')
+        end_day = str(parser.parse(today) + datetime.timedelta(days=days)).split(' ')[0]
         print(end_day)
         for user in ids:
             r = "SELECT * FROM payments WHERE uid = (%s)"
