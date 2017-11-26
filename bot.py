@@ -118,13 +118,6 @@ def start(message):
                      parse_mode="html")
     db.close()
 
-@bot.message_handler(commands=['test'])
-def test(message):
-    markup = telebot.types.InlineKeyboardMarkup()
-    for i in range(1000):
-        btn = telebot.types.InlineKeyboardButton(text=str(i), callback_data='.')
-        markup.add(btn)
-    bot.send_message(message.chat.id, 'test', reply_markup=markup)
 
 
 def getUserBalance(uid):
@@ -163,25 +156,17 @@ def getPaidIds():
     return res
 
 
-def getUsers():
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
-    cur = db.cursor()
-    r = "SELECT * FROM users"
-    cur.execute(r)
-    data = cur.fetchall()
-    res_string = ""
-    k = 0
-    for user in data:
-        k += 1
-        res_string += str(k) + ". " + " ".join([user[2], user[3], user[4]]) + "\n"
-    db.close()
-    return res_string
 
 
 @bot.message_handler(regexp="Админ-панель")
 def admin(message):
     if message.chat.id == const.admin:
         bot.send_message(message.chat.id, "Админ-панель", reply_markup=markups.adminPanel())
+
+@bot.callback_query_handler(func=lambda call: call.data == "admin")
+def admin2(call):
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.adminPanel())
+    bot.edit_message_text("Админ-панель", call.message.chat.id, call.message.message_id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "addVideo")
@@ -192,10 +177,34 @@ def addVideo(call):
 
 @bot.callback_query_handler(func=lambda call: call.data == "usersList")
 def showUsers(call):
-    large_text = getUsers()
-    splitted_text = telebot.util.split_string(large_text, 3000)
-    for text in splitted_text:
-        bot.send_message(call.message.chat.id, text)
+    const.listPointer = 0
+    bot.send_message(call.message.chat.id, "Список пользователей", reply_markup=markups.users())
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "nextList")
+def listforward(call):
+    const.listPointer += 1
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.users())
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "prevList")
+def listback(call):
+    const.listPointer -= 1
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=markups.users())
+
+
+def getUsers():
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT * FROM users"
+    cur.execute(r)
+    data = cur.fetchall()
+    const.userList.clear()
+    db.close()
+    for user in data:
+        const.userList.append(user[2]+ " " + user[3])
+    const.userList.sort()
+    return const.userList
 
 
 def getVideo(message):

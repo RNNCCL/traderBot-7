@@ -89,3 +89,29 @@ def withdrawBtn():
     btn = telebot.types.InlineKeyboardButton(text="Вывести", callback_data="withdraw")
     markup.add(btn)
     return markup
+
+
+def users():
+    markup = telebot.types.InlineKeyboardMarkup()
+    length = len(const.userList)
+    for i in range(10):
+        if const.listPointer * 10 + i > length - 1:
+            break
+        btn = telebot.types.InlineKeyboardButton(text=const.userList[const.listPointer * 10 + i], callback_data="<" + str(const.listPointer * 10 + i))
+        markup.row(btn)
+    f, b = False, False
+    if i == 9:
+        forward = telebot.types.InlineKeyboardButton(text="➡️", callback_data="nextList")
+        f = True
+    if const.listPointer != 0:
+        back = telebot.types.InlineKeyboardButton(text="⬅️", callback_data="prevList")
+        b = True
+    menu = telebot.types.InlineKeyboardButton(text="Меню", callback_data="admin")
+    if f and b:
+        markup.row(back, forward)
+    elif f:
+        markup.row(forward)
+    else:
+        markup.row(back)
+    markup.row(menu)
+    return markup
