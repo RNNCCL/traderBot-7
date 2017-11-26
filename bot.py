@@ -226,11 +226,10 @@ def detailedInfo(call):
     ids = cur.fetchall()
     if ids:
         text += "\nПригласил следующий список пользователей:\n"
-        res = ""
         for user in ids:
             r = "SELECT first_name, last_name from users WHERE uid = %s"
             cur.execute(r, user)
-            print(cur.fetchone())
+            text += " ".join(cur.fetchone()) + "\n"
     else:
         text += "\nЕще не пригласил ни одного пользователя"
     db.close()
