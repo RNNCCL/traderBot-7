@@ -249,19 +249,19 @@ def changePrices(call):
 def showInfo(call):
     text = "Текущая цена подписки: {price}\nВведите новую цену в биткойнах, цифры разделены точкой (0.15)"
     if call.data[2:] == "15":
-        text.format(price=str(const.days15))
+        text = text.format(price=str(const.days15))
         msg = bot.send_message(call.message.chat.id, text)
         bot.register_next_step_handler(msg, change15)
     if call.data[2:] == "30":
-        text.format(price=str(const.days30))
+        text = text.format(price=str(const.days30))
         msg = bot.send_message(call.message.chat.id, text)
         bot.register_next_step_handler(msg, change30)
     if call.data[2:] == "60":
-        text.format(price=str(const.days60))
+        text = text.format(price=str(const.days60))
         msg = bot.send_message(call.message.chat.id, text)
         bot.register_next_step_handler(msg, change60)
     if call.data[2:] == "90":
-        text.format(price=str(const.days90))
+        text = text.format(price=str(const.days90))
         msg = bot.send_message(call.message.chat.id, text)
         bot.register_next_step_handler(msg, change90)
 
