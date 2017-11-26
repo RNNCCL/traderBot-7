@@ -178,6 +178,7 @@ def addVideo(call):
 @bot.callback_query_handler(func=lambda call: call.data == "usersList")
 def showUsers(call):
     const.listPointer = 0
+    getUsers()
     bot.send_message(call.message.chat.id, "Список пользователей", reply_markup=markups.users())
 
 
