@@ -229,13 +229,73 @@ def detailedInfo(call):
         for user in ids:
             r = "SELECT first_name, last_name from users WHERE uid = %s"
             cur.execute(r, user)
-            text += " ".join(cur.fetchone()) + "\n"
+            text += "<b>" + " ".join(cur.fetchone()) + "</b>\n"
     else:
         text += "\nЕще не пригласил ни одного пользователя"
     db.close()
-    bot.edit_message_text(text, call.message.chat.id, call.message.message_id)
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, parse_mode="html")
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                   reply_markup=markups.showDetails(call.data[1:]))
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "changePrices")
+def changePrices(call):
+    bot.edit_message_text("Изменить цену на подписку", call.message.chat.id, call.message.message_id)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
+                                  reply_markup=markups.chooseMonth())
+
+
+@bot.callback_query_handler(func=lambda call: call.data[0:2] == "$$")
+def showInfo(call):
+    text = "Текущая цена подписки: {0}\nВведите новую цену в биткойнах, цифры разделены точкой (0.15)"
+    if call.data[2:] == "15":
+        text.format(str(const.days15))
+        msg = bot.send_message(call.message.chat.id, text)
+        bot.register_next_step_handler(msg, change15)
+    if call.data[2:] == "30":
+        text.format(str(const.days30))
+        msg = bot.send_message(call.message.chat.id, text)
+        bot.register_next_step_handler(msg, change30)
+    if call.data[2:] == "60":
+        text.format(str(const.days60))
+        msg = bot.send_message(call.message.chat.id, text)
+        bot.register_next_step_handler(msg, change60)
+    if call.data[2:] == "90":
+        text.format(str(const.days90))
+        msg = bot.send_message(call.message.chat.id, text)
+        bot.register_next_step_handler(msg, change90)
+
+
+def change15(message):
+    try:
+        const.days15 = float(message.text)
+        bot.send_message(message.chat.id, "Цена изменена", reply_markup=markups.adminPanel())
+    except:
+        bot.send_message(message.chat.id, "Неправильный формат", reply_markup=markups.adminPanel())
+
+
+def change30(message):
+    try:
+        const.days30 = float(message.text)
+        bot.send_message(message.chat.id, "Цена изменена", reply_markup=markups.adminPanel())
+    except:
+        bot.send_message(message.chat.id, "Неправильный формат", reply_markup=markups.adminPanel())
+
+
+def change60(message):
+    try:
+        const.days60 = float(message.text)
+        bot.send_message(message.chat.id, "Цена изменена", reply_markup=markups.adminPanel())
+    except:
+        bot.send_message(message.chat.id, "Неправильный формат", reply_markup=markups.adminPanel())
+
+
+def change90(message):
+    try:
+        const.days90 = float(message.text)
+        bot.send_message(message.chat.id, "Цена изменена", reply_markup=markups.adminPanel())
+    except:
+        bot.send_message(message.chat.id, "Неправильный формат", reply_markup=markups.adminPanel())
 
 
 @bot.callback_query_handler(func=lambda call: call.data[0:10] == "changeDate")

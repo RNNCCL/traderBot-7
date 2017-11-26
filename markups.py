@@ -19,10 +19,12 @@ def adminPanel():
     users = telebot.types.InlineKeyboardButton(text="Список пользователей", callback_data="usersList")
     demo_on = telebot.types.InlineKeyboardButton(text="Включить демо доступ", callback_data="demo on")
     demo_off = telebot.types.InlineKeyboardButton(text="Выключить демо доступ", callback_data="demo off")
+    changePrice = telebot.types.InlineKeyboardButton(text="Изменить цены на подписку", callback_data="changePrices")
     markup.row(allBtn)
     markup.row(paid)
     markup.row(video)
     markup.row(users)
+    markup.row(changePrice)
     markup.add(demo_on, demo_off)
     return markup
 
@@ -124,5 +126,20 @@ def showDetails(uid):
     changeData = telebot.types.InlineKeyboardButton(text="Изменить срок подписки", callback_data="changeDate" + uid)
     back = telebot.types.InlineKeyboardButton(text="Назад", callback_data="usersList")
     markup.row(changeData)
+    markup.row(back)
+    return markup
+
+
+def chooseMonth():
+    markup = telebot.types.InlineKeyboardMarkup()
+    btn1 = telebot.types.InlineKeyboardButton(text="15 дней", callback_data="$$15")
+    btn2 = telebot.types.InlineKeyboardButton(text="30 дней", callback_data="$$30")
+    btn3 = telebot.types.InlineKeyboardButton(text="60 дней", callback_data="$$60")
+    btn4 = telebot.types.InlineKeyboardButton(text="90 дней", callback_data="$$90")
+    back = telebot.types.InlineKeyboardButton(text="Назад", callback_data="admin")
+    markup.row(btn1)
+    markup.row(btn2)
+    markup.row(btn3)
+    markup.row(btn4)
     markup.row(back)
     return markup
