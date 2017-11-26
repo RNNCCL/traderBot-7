@@ -17,10 +17,13 @@ def adminPanel():
     paid = telebot.types.InlineKeyboardButton(text="Рассылка по подписке", callback_data="toPaid")
     video = telebot.types.InlineKeyboardButton(text="Добавить видео", callback_data="addVideo")
     users = telebot.types.InlineKeyboardButton(text="Список пользователей", callback_data="usersList")
+    demo_on = telebot.types.InlineKeyboardButton(text="Включить демо доступ", callback_data="demo on")
+    demo_off = telebot.types.InlineKeyboardButton(text="Выключить демо доступ", callback_data="demo off")
     markup.row(allBtn)
     markup.row(paid)
     markup.row(video)
     markup.row(users)
+    markup.add(demo_on, demo_off)
     return markup
 
 

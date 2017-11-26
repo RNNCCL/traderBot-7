@@ -60,6 +60,15 @@ def daily_check():
     r = 'SELECT uid, end_date FROM payments'
     cur.execute(r)
     res = cur.fetchall()
+    r = "SELECT state, days FROM demo WHERE id = 1"
+    cur.execute(r)
+    state, days_left = cur.fetchone()
+    if state == "1":
+        if days_left == "0":
+            r = "UPDATE demo SET state = 0 WHERE id = 1"
+        else:
+            r = "UPDATE demo SET days = days - 1 WHERE id = 1"
+        cur.execute(r)
     today = str(datetime.datetime.now()).split(' ')[0]
     after_tomorrow = parser.parse(today) + datetime.timedelta(days=2)
     for user in res:
@@ -156,7 +165,7 @@ def getUsers():
     k = 0
     for user in data:
         k += 1
-        res_string += str(k) + " ".join([user[2], user[3], user[4]]) + "\n"
+        res_string += str(k) + ". " + " ".join([user[2], user[3], user[4]]) + "\n"
     db.close()
     return res_string
 
@@ -189,6 +198,49 @@ def getVideo(message):
     db.commit()
     db.close()
     bot.send_message(message.chat.id, "Видео успешно добавлено!")
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "demo on")
+def turn_on_demo(call):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT state from demo"
+    cur.execute(r)
+    state = int(cur.fetchone()[0])
+    if state:
+        bot.send_message(call.message.chat.id, "Демо режим уже включен", reply_markup=markups.adminPanel())
+    else:
+        msg = bot.send_message(call.message.chat.id, "Введите количество дней, на которое хотите включить")
+        bot.register_next_step_handler(msg, handle_days)
+
+
+def handle_days(message):
+    try:
+        days = int(message.text)
+        db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+        cur = db.cursor()
+        r = "UPDATE demo SET state = 1"
+        cur.execute(r)
+        db.commit()
+        r = "SELECT uid FROM users"
+        cur.execute(r)
+        ids = cur.fetchall()
+        print(ids)
+        today = str(datetime.datetime.now()).split(' ')[0]
+        end_day = parser.parse(today) + datetime.timedelta(days=days)
+        print(end_day)
+        for user in ids:
+            r = "SELECT * FROM payments WHERE uid = (%s)"
+            cur.execute(r, user)
+            if cur.fetchone():
+                continue
+            else:
+                request = "INSERT INTO payments (uid, end_date) VALUE (%s,%s)"
+                cur.execute(request, (user, end_day))
+            time.sleep(0.1)
+
+    except:
+        bot.send_message(message.chat.id, "Неправильный формат")
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "toAll")
