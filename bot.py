@@ -203,9 +203,59 @@ def getUsers():
     const.userList.clear()
     db.close()
     for user in data:
-        const.userList.append(user[2]+ " " + user[3])
+        const.userList.append(user[2] + " " + user[3] + '%' + user[0])
     const.userList.sort()
     return const.userList
+
+
+@bot.callback_query_handler(func=lambda call: call.data[0] == '<')
+def detailedInfo(call):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT * FROM payments WHERE uid = %s"
+    cur.execute(r, call.data[1:])
+    data = cur.fetchone()
+    if data:
+        text = "Куплена подписка до %s" % data[1]
+    else:
+        text = "У данного пользователя не куплена подписка"
+    r = "SELECT INVITED_ID FROM INVITATIONS WHERE ID = %s"
+    cur.execute(r, call.data[1:])
+    ids = cur.fetchall()
+    text += "\nПригласил следующий список пользователей:\n"
+    if ids:
+        res = ""
+        for user in ids:
+            r = "SELECT first_name, last_name from users WHERE uid = %s"
+            cur.execute(r, user)
+            print(cur.fetchone())
+    db.close()
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
+                                  reply_markup=markups.showDetails(call.data[1:]))
+
+
+@bot.callback_query_handler(func=lambda call: call.data[0:10] == "changeDate")
+def changeDate(call):
+    const.chosenUserId = call.data[10:]
+    msg = bot.send_message(call.message.chat.id, "Введите дату формате 2017-03-23 <b>(гггг-мм-чч)</b>\n")
+    bot.register_next_step_handler(msg, confirm_date)
+
+
+def confirm_date(message):
+    if len(message.text) == 10:
+        date = message.text.replace(".", "-")
+        db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+        cur = db.cursor()
+        r = "SELECT * FROM payments WHERE uid = %s"
+        cur.execute(r, const.chosenUserId)
+        if not cur.fetchone():
+            r = "INSERT INTO payments (end_date, uid) VALUE (%s,%s)"
+        else:
+            r = "UPDATE payments SET end_date = %s WHERE uid = %s"
+        cur.execute(r, (date, const.chosenUserId))
+        db.commit()
+        db.close()
 
 
 def getVideo(message):

@@ -97,7 +97,9 @@ def users():
     for i in range(10):
         if const.listPointer * 10 + i > length - 1:
             break
-        btn = telebot.types.InlineKeyboardButton(text=const.userList[const.listPointer * 10 + i], callback_data="<" + str(const.listPointer * 10 + i))
+        data = const.userList[const.listPointer * 10 + i]
+        symbol = data[:data.find('%')]
+        btn = telebot.types.InlineKeyboardButton(text=data[:symbol], callback_data="<" + data[symbol:])
         markup.row(btn)
     f, b = False, False
     if i == 9:
@@ -114,4 +116,13 @@ def users():
     elif b:
         markup.row(back)
     markup.row(menu)
+    return markup
+
+
+def showDetails(uid):
+    markup = telebot.types.InlineKeyboardMarkup()
+    changeData = telebot.types.InlineKeyboardButton(text="Изменить срок подписки", callback_data="changeDate" + uid)
+    back = telebot.types.InlineKeyboardButton(text="Назад", callback_data="userList")
+    markup.row(changeData)
+    markup.row(back)
     return markup

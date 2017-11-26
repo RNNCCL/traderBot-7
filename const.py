@@ -50,4 +50,5 @@ walletApiKey = "6F741581595CC0333CB754A25A42476D"
 
 listPointer = 0
 userList = []
+chosenUserId = ""
 
