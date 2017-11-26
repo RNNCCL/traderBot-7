@@ -54,8 +54,11 @@ async def handle(request):
 app.router.add_post('/{token}/', handle)
 
 
+def connect():
+    return sql.connect("localhost", "root", "churchbynewton", "TRADER", use_unicode=True, charset="utf8")
+
 def daily_check():
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = 'SELECT uid, end_date FROM payments'
     cur.execute(r)
@@ -87,7 +90,7 @@ def daily_check():
 
 
 def addInvitation(user_id, invited_user_id):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT * FROM INVITATIONS WHERE INVITED=%s"
     cur.execute(r, invited_user_id)
@@ -105,7 +108,7 @@ def start(message):
         if text[1].isdigit():
             initial_id = text[1]
             addInvitation(initial_id, message.chat.id)
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = 'SELECT * FROM users WHERE uid = %s'
     cur.execute(r, message.chat.id)
@@ -121,7 +124,7 @@ def start(message):
 
 
 def getUserBalance(uid):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT balance FROM users WHERE uid = %s"
     cur.execute(r, uid)
@@ -131,7 +134,7 @@ def getUserBalance(uid):
 
 
 def getIds():
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT uid FROM users"
     cur.execute(r)
@@ -144,7 +147,7 @@ def getIds():
 
 
 def getPaidIds():
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT uid FROM payments"
     cur.execute(r)
@@ -197,7 +200,7 @@ def listback(call):
 
 
 def getUsers():
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT * FROM users"
     cur.execute(r)
@@ -212,7 +215,7 @@ def getUsers():
 
 @bot.callback_query_handler(func=lambda call: call.data[0] == '<')
 def detailedInfo(call):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT * FROM payments WHERE uid = %s"
     cur.execute(r, call.data[1:])
@@ -308,7 +311,7 @@ def changeDate(call):
 def confirm_date(message):
     if len(message.text) == 10:
         date = message.text.replace(".", "-")
-        db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+        db = connect()
         cur = db.cursor()
         r = "SELECT * FROM payments WHERE uid = %s"
         cur.execute(r, const.chosenUserId)
@@ -325,7 +328,7 @@ def confirm_date(message):
 
 
 def getVideo(message):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = 'INSERT INTO VIDEO (link) VALUES (%s)'
     cur.execute(r, message.text)
@@ -336,7 +339,7 @@ def getVideo(message):
 
 @bot.callback_query_handler(func=lambda call: call.data == "demo on")
 def turn_on_demo(call):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT state from demo"
     cur.execute(r)
@@ -350,7 +353,7 @@ def turn_on_demo(call):
 
 @bot.callback_query_handler(func=lambda call: call.data == "demo off")
 def turn_off(call):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT state, days from demo"
     cur.execute(r)
@@ -364,7 +367,7 @@ def turn_off(call):
 def handle_days(message):
     try:
         days = int(message.text)
-        db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+        db = connect()
         cur = db.cursor()
         r = "UPDATE demo SET state = 1"
         cur.execute(r)
@@ -475,7 +478,7 @@ def startWork(message):
 
 @bot.message_handler(regexp="Посмотреть отзывы")
 def showVideos(message):
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = "SELECT link FROM VIDEO"
     cur.execute(r)
@@ -523,7 +526,7 @@ def processPayment(call):
     else:
         pay = const.days90
     address = createBTCAddress()
-    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    db = connect()
     cur = db.cursor()
     r = 'SELECT * FROM TEMP_DETAILS WHERE ID = %s'
     cur.execute(r, call.message.chat.id)
