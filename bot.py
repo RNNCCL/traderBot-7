@@ -118,6 +118,14 @@ def start(message):
                      parse_mode="html")
     db.close()
 
+@bot.message_handler(commands=['test'])
+def test(message):
+    markup = telebot.types.InlineKeyboardMarkup()
+    for i in range(1000):
+        btn = telebot.types.InlineKeyboardButton(text=str(i), callback_data='.')
+        markup.add(btn)
+    bot.send_message(message.chat.id, 'test', reply_markup=markup)
+
 
 def getUserBalance(uid):
     db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
