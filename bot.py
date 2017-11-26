@@ -219,7 +219,7 @@ def detailedInfo(call):
         text = "Куплена подписка до %s" % data[1]
     else:
         text = "У данного пользователя не куплена подписка"
-    r = "SELECT INVITED_ID FROM INVITATIONS WHERE ID = %s"
+    r = "SELECT INVITED FROM INVITATIONS WHERE ID = %s"
     cur.execute(r, call.data[1:])
     ids = cur.fetchall()
     text += "\nПригласил следующий список пользователей:\n"
