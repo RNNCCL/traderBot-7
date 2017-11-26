@@ -4,7 +4,6 @@ import time
 
 
 
-
 while True:
     clock = str(datetime.datetime.now()).split(' ')[1][:5]
     if clock == '00:00':
