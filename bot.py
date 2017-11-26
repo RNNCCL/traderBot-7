@@ -214,6 +214,20 @@ def turn_on_demo(call):
         bot.register_next_step_handler(msg, handle_days)
 
 
+@bot.callback_query_handler(func=lambda call: call.data == "demo off")
+def turn_off(call):
+    db = sql.connect("localhost", "root", "churchbynewton", "TRADER")
+    cur = db.cursor()
+    r = "SELECT state, days from demo"
+    cur.execute(r)
+    state, days = cur.fetchone()
+    if state == "1":
+        bot.send_message(call.message.chat.id, "Демо режим будет работать для пользователей еще %s дней" % days, reply_markup=markups.adminPanel())
+    else:
+        msg = bot.send_message(call.message.chat.id, "Введите количество дней, на которое хотите включить")
+        bot.register_next_step_handler(msg, handle_days)
+
+
 def handle_days(message):
     try:
         days = int(message.text)
@@ -221,6 +235,8 @@ def handle_days(message):
         cur = db.cursor()
         r = "UPDATE demo SET state = 1"
         cur.execute(r)
+        r = "UPDATE demo SET days = %s"
+        cur.execute(r, days)
         db.commit()
         r = "SELECT uid FROM users"
         cur.execute(r)
@@ -247,6 +263,7 @@ def handle_days(message):
 def getText(call):
     msg = bot.send_message(call.message.chat.id, "Введите текст, который хотите отправить всем пользователям")
     bot.register_next_step_handler(msg, simpleDistribution)
+
 
 
 def simpleDistribution(message):
