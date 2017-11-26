@@ -376,10 +376,8 @@ def handle_days(message):
         r = "SELECT uid FROM users"
         cur.execute(r)
         ids = cur.fetchall()
-        print(ids)
         today = str(datetime.datetime.now()).split(' ')[0]
         end_day = str(parser.parse(today) + datetime.timedelta(days=days)).split(' ')[0]
-        print(end_day)
         for user in ids:
             r = "SELECT * FROM payments WHERE uid = (%s)"
             cur.execute(r, user)
@@ -400,7 +398,6 @@ def handle_days(message):
 def getText(call):
     msg = bot.send_message(call.message.chat.id, "Введите текст, который хотите отправить всем пользователям")
     bot.register_next_step_handler(msg, simpleDistribution)
-
 
 
 def simpleDistribution(message):
@@ -437,7 +434,7 @@ def paidDistribution(message):
 @bot.message_handler(regexp="Партнерская программа")
 def materials(message):
     balance = "<b>Ваш баланс:</b> %s BTC\n" % getUserBalance(message.chat.id)
-    text = "<b>Ваша реферальная ссылка:</b>\nhttps://t.me/arthur1bot?start=%s" % message.chat.id
+    text = "<b>Ваша реферальная ссылка:</b>\nhttps://t.me/BestCryptoInsideBot?start=%s" % message.chat.id
     bot.send_message(message.chat.id, balance + text,  parse_mode="html", reply_markup=markups.withdrawBtn())
 
 
